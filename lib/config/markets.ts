@@ -373,7 +373,6 @@ const ALL_EXTENDED_MARKETS: ExtendedMarket[] = [
     change24h: "+0.00",
     volume24h: "-",
     available: true,
-    displaySoon: true,
   },
   {
     symbol: "AAPL",
