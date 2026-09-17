@@ -1,15 +1,20 @@
-// MEME — the SPL quote token for market 129 (SPY-PERP-MEME) on Solana
-// devnet. Authoritative config: elysia-perp dev config.dev.toml
-// [[deposit.solana.tokens]] — mint below, asset_id 9004, 6 decimals, rate 1/1
-// ($1 peg, so a deposit credits 1:1 with no rounding). Classic SPL Token
-// program (Token-2022 is rejected by the vault).
+// MEME — the SPL quote token for market 129 (SPY-PERP-MEME). asset_id 9004,
+// 6 decimals, rate 1/1 ($1 peg, so a deposit credits 1:1 with no rounding).
+// Classic SPL Token program (Token-2022 is rejected by the vault).
+//
+// The mint differs per cluster (devnet vs mainnet), selected by IS_MAINNET
+// (NEXT_PUBLIC_NETWORK). The vault PROGRAM id is the same on both clusters, so
+// it lives only in the IDL (lib/solana/idl/elysia_perp.json #address).
 
 import { web3 } from "@coral-xyz/anchor"
+import { IS_MAINNET } from "./network"
 
 const { PublicKey } = web3
 
 export const MEME_MINT = new PublicKey(
-  "SPYDv38dP1pKpXN6EUo6FHibBgjoJmFxhWbetsoA9VH"
+  IS_MAINNET
+    ? "MEME8wrHLaa2ByDN2rHKtJsZh2grZU8ACR7r3VMM82x"
+    : "SPYDv38dP1pKpXN6EUo6FHibBgjoJmFxhWbetsoA9VH"
 )
 export const MEME_ASSET_ID = 9004
 export const MEME_DECIMALS = 6
