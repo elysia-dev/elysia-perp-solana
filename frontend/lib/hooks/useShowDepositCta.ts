@@ -1,6 +1,6 @@
 "use client"
 
-import { useConnection } from "wagmi"
+import { useAppKitAccount } from "@reown/appkit/react"
 import { useBalance } from "@/lib/hooks/useBalance"
 import { useSelectedPair } from "@/lib/stores"
 import type { Balance } from "@/types"
@@ -17,7 +17,7 @@ import type { Balance } from "@/types"
  * and the mobile sticky Buy/Sell bar so the two can never disagree.
  */
 export function useShowDepositCta(): boolean {
-  const { address } = useConnection()
+  const { address } = useAppKitAccount({ namespace: "solana" })
   const { data: balanceData } = useBalance()
   const pair = useSelectedPair()
 

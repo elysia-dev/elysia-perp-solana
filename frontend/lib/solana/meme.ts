@@ -39,3 +39,8 @@ export function getAssociatedTokenAddress(
 // wallet's selected cluster (signing is cluster-agnostic).
 export const DEVNET_RPC =
   process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.devnet.solana.com"
+
+/** "View tx" link on the Solana explorer (devnet cluster). */
+export function getExplorerTxUrl(signature: string): string {
+  return `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+}

@@ -12,7 +12,6 @@ import { EcosystemLogo } from "@/components/trading/ecosystem-logo"
 import { useMarketStore, useSelectedPair } from "@/lib/stores"
 import { useSolBalance } from "@/lib/solana/useSolBalance"
 import { MEME_ASSET_ID } from "@/lib/solana/meme"
-import { ACTIVE_COLLATERAL_ASSET_IDS } from "@/lib/contracts/addresses"
 import {
   ECOSYSTEMS,
   isPairRoutable,
@@ -53,14 +52,11 @@ export function CollateralSelectorDialog({ trigger }: Props) {
   const currentQuote = pair.quote_currency
   const base = pair.base.toUpperCase()
 
-  // A collateral is selectable when the network config says it's active
-  // (ACTIVE_COLLATERAL_ASSET_IDS — mainnet: EL only; testnet: EL + USDT per
-  // ELP-499; retired USDC/ARB read "Soon"), isPairRoutable allows it for
-  // this base (testnet USDT is scoped to USDKRW — BTC-PERP-USDT still
-  // exists on dev but is retired), and a live pair actually exists.
+  // Solana build: MEME is the only live collateral; every other ecosystem
+  // reads "Soon". A collateral is selectable when it's MEME, the pair is
+  // routable for this base, and a live pair actually exists.
   const isLiveFor = (eco: (typeof ECOSYSTEMS)[number]) =>
-    eco.quoteAssetId != null &&
-    ACTIVE_COLLATERAL_ASSET_IDS.includes(eco.quoteAssetId) &&
+    eco.quoteAssetId === MEME_ASSET_ID &&
     isPairRoutable(base, eco.quoteAssetId) &&
     pairs.some(
       (p) =>

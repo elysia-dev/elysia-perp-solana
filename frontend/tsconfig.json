@@ -19,13 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      // Type-resolution target for the env-selected network config. The REAL
-      // per-build selection happens in next.config.ts (turbopack.resolveAlias)
-      // — this entry only gives tsc a concrete module to type against. Both
-      // config files `satisfies NetworkConfig`, so either target typechecks
-      // identically.
-      "@network-config": ["./lib/config/network-config.testnet.ts"]
+      "@/*": ["./*"]
     }
   },
   "include": [

@@ -1,9 +1,7 @@
 import { SolanaAdapter } from "@reown/appkit-adapter-solana/react"
 
-// Solana side of the multi-chain Reown AppKit (added for the Solana hackathon
-// track). The EVM app is unchanged — this only lets AppKit connect a Solana
-// wallet alongside the wagmi/EVM adapter. Auth/trading remain EVM-only until
-// the backend accepts Solana signatures.
+// Solana adapter for Reown AppKit — the app's only wallet adapter. Connect,
+// login (ed25519 signature), and deposits all run on Solana devnet.
 //
 // No explicit wallet adapters: modern Phantom/Solflare register through the
 // Wallet Standard, so AppKit discovers them automatically. Passing the

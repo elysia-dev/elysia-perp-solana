@@ -10,7 +10,7 @@ import { LeverageModal } from "@/components/trading/leverage-modal"
 import { MarginModeModal } from "@/components/trading/margin-mode-modal"
 import { useBalance } from "@/lib/hooks/useBalance"
 import { Balance, PerpOrderType, sideToIsAsk } from "@/types"
-import { useConnection } from "wagmi"
+import { useAppKitAccount } from "@reown/appkit/react"
 import { tradingToast } from "@/lib/utils/toast"
 import { useCreatePerpOrder } from "@/lib/hooks/useCreatePerpOrder"
 import { useMarketMode } from "@/lib/hooks/useMarketMode"
@@ -155,7 +155,7 @@ export function PerpTradingForm() {
   const positions = usePositionsList()
   const currentMarketPosition = useCurrentMarketPosition(pair.name)
   const { data: balanceData, refetch: refetchBalance } = useBalance()
-  const { address } = useConnection()
+  const { address } = useAppKitAccount({ namespace: "solana" })
   const { isAuthenticated } = useAuthContext()
   const setDepositOpen = useDepositWithdrawModal((s) => s.setDepositOpen)
   const showDepositCta = useShowDepositCta()

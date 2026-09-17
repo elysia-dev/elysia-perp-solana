@@ -29,23 +29,6 @@ const SECURITY_HEADERS = [
 ]
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    resolveAlias: {
-      // Build-time selection of the network config module. Mainnet builds
-      // (staging/prod, NEXT_PUBLIC_NETWORK=mainnet) bundle ONLY the mainnet
-      // file; every other env bundles ONLY the testnet file. This is what
-      // keeps testnet chain config (Giwa RPC, mock-token addresses, …)
-      // physically OUT of production bundles — a runtime `IS_MAINNET ? A : B`
-      // ternary ships both branches because the bundler can't constant-fold
-      // a cross-module const (verified: giwa strings appeared in mainnet
-      // chunks under the old scheme). Keep in sync with the tsconfig
-      // `@network-config` path, which exists only for type resolution.
-      "@network-config":
-        process.env.NEXT_PUBLIC_NETWORK === "mainnet"
-          ? "./lib/config/network-config.mainnet.ts"
-          : "./lib/config/network-config.testnet.ts",
-    },
-  },
   async headers() {
     return [
       {

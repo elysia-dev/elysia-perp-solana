@@ -3,10 +3,7 @@
 import { useRef, useCallback, useEffect } from "react"
 import { Loader2 } from "lucide-react"
 import { formatDate, getAssetName } from "@/lib/utils"
-import {
-  findCollateralByAddress,
-  getExplorerTxUrl,
-} from "@/lib/contracts/addresses"
+import { MEME_ASSET_ID, getExplorerTxUrl } from "@/lib/solana/meme"
 import type { Deposit, DepositStatus } from "@/types"
 
 interface DepositsTabProps {
@@ -97,18 +94,8 @@ export function DepositsTab({
             <tbody className="relative">
               {deposits.map((deposit, index) => {
                 const status = getStatusDisplay(deposit.status)
-                // The deposit row tells us the *token contract address*
-                // and nothing about which chain it lives on. Search every
-                // registered collateral chain (Sepolia, Arbitrum Sepolia,
-                // …) for a match — the old single-chain lookup against
-                // `sepolia.id` silently rendered ARB deposits as "EL$"
-                // and pointed the tx link at the wrong block explorer.
-                const collateral = findCollateralByAddress(
-                  deposit.token_address
-                )
-                const symbol = collateral
-                  ? getAssetName(collateral.assetId)
-                  : "EL$"
+                // Solana build: the only deposit collateral is MEME.
+                const symbol = getAssetName(MEME_ASSET_ID)
 
                 return (
                   <tr
@@ -131,10 +118,7 @@ export function DepositsTab({
                     </td>
                     <td className="flex min-w-[160px]">
                       <a
-                        href={getExplorerTxUrl(
-                          collateral?.chainId,
-                          deposit.tx_hash
-                        )}
+                        href={getExplorerTxUrl(deposit.tx_hash)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-400 hover:text-foreground"

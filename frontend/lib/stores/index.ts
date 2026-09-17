@@ -9,5 +9,4 @@ export {
   selectMarkPrice,
   selectMarkPriceData,
 } from "./useMarkPriceStore"
-export { usePendingDepositStore } from "./usePendingDepositStore"
 export { useHistoryTabStore } from "./useHistoryTabStore"

@@ -65,9 +65,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Solana hackathon build: auth follows the connected Solana wallet (Reown
-  // AppKit), not the disabled EVM/wagmi adapter. `status` is derived from
-  // `isConnected` so the disconnect/auto-logout effects below behave the same.
+  // Auth follows the connected Solana wallet (Reown AppKit). `status` is
+  // derived from `isConnected` so the disconnect/auto-logout effects below
+  // behave the same.
   const { isConnected, address } = useAppKitAccount({ namespace: "solana" })
   const status: "connected" | "disconnected" = isConnected
     ? "connected"

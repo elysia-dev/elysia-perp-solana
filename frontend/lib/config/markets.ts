@@ -10,12 +10,8 @@
  * 2. Drop its token icon at `public/icons/tokens/<base>.svg`.
  * 3. Add an `EXTENDED_MARKETS` entry with `available: true` and add the
  *    base to `ICONED_BASES` below (iconless markets are hidden).
- * 4. If its collateral is scoped to specific bases, extend
- *    `collateralBaseScope` in the network configs (`@network-config`).
+ * 4. If its collateral is scoped to specific bases, extend `isPairRoutable`.
  */
-
-import { networkConfig } from "@network-config"
-import { IS_MAINNET } from "@/lib/constants/network"
 
 export type ExtendedMarketCategory =
   | "major"
@@ -74,11 +70,8 @@ export const ECOSYSTEMS: Ecosystem[] = [
     //     `market-selector-dialog`'s `resolvePair` return undefined for
     //     every ARB symbol, which the row renderer translates into the
     //     "Soon" pill and an inactive (non-clickable-into-trade) state.
-    // Drop this gate once an ARB-on-mainnet collateral lands.
-    // Env-gated rail: set only when the selected network config declares a
-    // live ARB collateral (testnet → MockARB 11841; mainnet → absent, so the
-    // ecosystem reads "Soon"). See ecosystemQuoteAssetIds in @network-config.
-    quoteAssetId: networkConfig.ecosystemQuoteAssetIds.arbitrum,
+    // Solana build: no live EVM ARB rail → reads "Soon".
+    quoteAssetId: undefined,
   },
   {
     id: "elysia",
@@ -98,12 +91,8 @@ export const ECOSYSTEMS: Ecosystem[] = [
     // USDC brand blue #2775CA.
     color: "oklch(0.55 0.14 255)",
     logo: "/icons/tokens/usdc.svg",
-    // USDC rail is testnet-only: MockUSDC on Giwa Sepolia (asset_id 3408,
-    // server ELP-400, quotes BTC-PERP-USDC). No mainnet deployment →
-    // undefined keeps it "Soon" in mainnet mode, same gate as ARB.
-    // Env-gated rail: MockUSDC on Giwa Sepolia (asset 3408) in testnet mode;
-    // absent on mainnet → "Soon". See ecosystemQuoteAssetIds in @network-config.
-    quoteAssetId: networkConfig.ecosystemQuoteAssetIds.usdc,
+    // Solana build: no live EVM USDC rail → reads "Soon".
+    quoteAssetId: undefined,
   },
   {
     id: "usdt",
@@ -200,14 +189,11 @@ export function getEcosystemByQuoteAssetId(
 
 /**
  * May the trade UI route to the pair `base` quoted in `quoteAssetId`?
- * Backed by `collateralBaseScope` in the per-network config: a scoped
- * collateral (testnet USDT → USDKRW only, ELP-499) is invisible to both the
- * collateral picker and the market selector's cross-collateral fallback
- * outside its bases; unscoped collaterals are valid everywhere.
+ * Solana build: MEME is the only live collateral and is unscoped, so every
+ * pair is routable.
  */
-export function isPairRoutable(base: string, quoteAssetId: number): boolean {
-  const scope = networkConfig.collateralBaseScope[quoteAssetId]
-  return scope ? scope.includes(base.toUpperCase()) : true
+export function isPairRoutable(_base: string, _quoteAssetId: number): boolean {
+  return true
 }
 
 /**
@@ -668,11 +654,7 @@ const ALL_EXTENDED_MARKETS: ExtendedMarket[] = [
 ]
 
 /**
- * The catalog the UI actually lists. `testnetOnly` entries (USDKRW while it
- * exists only on the dev server) are stripped from mainnet builds
- * (staging/prod) entirely — hiding at the source keeps every consumer
- * (selector rows, tabs, symbol lookups) consistent.
+ * The catalog the UI actually lists. This devnet build keeps every entry,
+ * including `testnetOnly` ones (e.g. USDKRW).
  */
-export const EXTENDED_MARKETS: ExtendedMarket[] = ALL_EXTENDED_MARKETS.filter(
-  (m) => !m.testnetOnly || !IS_MAINNET
-)
+export const EXTENDED_MARKETS: ExtendedMarket[] = ALL_EXTENDED_MARKETS

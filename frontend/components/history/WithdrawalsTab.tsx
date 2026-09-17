@@ -3,10 +3,7 @@
 import { useRef, useCallback, useEffect } from "react"
 import { Loader2 } from "lucide-react"
 import { formatDate, getAssetName } from "@/lib/utils"
-import {
-  ASSET_ID_TO_CHAIN_ID,
-  getExplorerTxUrl,
-} from "@/lib/contracts/addresses"
+import { getExplorerTxUrl } from "@/lib/solana/meme"
 import type { Withdrawal, WithdrawalStatus } from "@/types"
 
 interface WithdrawalsTabProps {
@@ -162,15 +159,7 @@ export function WithdrawalsTab({
                     <td className="flex min-w-[160px]">
                       {withdrawal.tx_hash ? (
                         <a
-                          href={getExplorerTxUrl(
-                            // Withdrawal payload already carries
-                            // `asset_id`; map it to the chain that hosts
-                            // the asset. Avoids the old hard-coded
-                            // `sepolia.etherscan.io` link, which sent
-                            // ARB withdraws to the wrong explorer.
-                            ASSET_ID_TO_CHAIN_ID[withdrawal.asset_id],
-                            withdrawal.tx_hash
-                          )}
+                          href={getExplorerTxUrl(withdrawal.tx_hash)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-400 hover:text-foreground"

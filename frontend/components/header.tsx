@@ -23,7 +23,6 @@ import { SolanaDepositModal } from "@/components/solana-deposit-modal"
 import { SolanaWithdrawModal } from "@/components/solana-withdraw-modal"
 import { AuthModal } from "@/components/auth-modal"
 import { DevToolbar } from "@/components/dev/dev-toolbar"
-import { usePendingDepositMonitor } from "@/lib/hooks/usePendingDepositMonitor"
 import { useBalance } from "@/lib/hooks/useBalance"
 import { isLoggedInCookiePresent } from "@/lib/utils/cookie"
 import { useSelectedPair } from "@/lib/stores"
@@ -100,7 +99,6 @@ export function Header() {
   const withdrawOpen = useDepositWithdrawModal((s) => s.withdrawOpen)
   const setWithdrawOpen = useDepositWithdrawModal((s) => s.setWithdrawOpen)
   const selectedPair = useSelectedPair()
-  usePendingDepositMonitor()
   const { data: balanceData } = useBalance()
   // Wallet Balance = the connected wallet's native SOL on devnet (the cluster
   // the vault program lives on). Replaces the EVM ERC20 read.

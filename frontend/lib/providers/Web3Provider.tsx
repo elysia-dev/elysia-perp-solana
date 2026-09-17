@@ -1,12 +1,16 @@
 "use client"
 
-import { wagmiAdapter, projectId } from "@/lib/constants/wagmi"
 import { solanaAdapter } from "@/lib/constants/solana"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { createAppKit } from "@reown/appkit/react"
 import { solanaDevnet } from "@reown/appkit/networks"
-import React, { type ReactNode } from "react"
-import { cookieToInitialState, WagmiProvider, type Config } from "wagmi"
+import { type ReactNode } from "react"
+
+// Reown/WalletConnect project id. Public client identifier (NOT a secret), so
+// it ships in the bundle either way — env-driven only to allow a different
+// project per environment. Falls back to the shared default when unset.
+const projectId =
+  process.env.NEXT_PUBLIC_REOWN_PROJECT_ID || "4904537e8592e7bd77c13800298adf15"
 
 // Set up queryClient
 const queryClient = new QueryClient({
@@ -54,22 +58,14 @@ const metadata = {
   },
 }
 
-// Create the modal (side effect initializes AppKit). Network set mirrors
-// `lib/constants/wagmi.ts#networks` so the AppKit picker and the wagmi
-// adapter agree on which chains the user can connect to in this build.
+// Create the modal (side effect initializes AppKit). Solana-only: the connect
+// modal offers Solana wallets, connected to devnet where the vault program lives.
 createAppKit({
-  // Solana hackathon build: the connect modal is Solana-only. The EVM (wagmi)
-  // adapter and EVM networks are commented out below — restore them to bring
-  // EVM wallets back into the modal.
-  //
-  // NOTE: WagmiProvider (and wagmiAdapter.wagmiConfig) is still mounted below
-  // so the EVM-based trade/auth hooks keep compiling; they're just dormant
-  // until auth is re-wired to Solana on the backend.
-  adapters: [solanaAdapter /*, wagmiAdapter */],
+  adapters: [solanaAdapter],
   projectId,
   // Devnet only: the vault program is deployed on Solana devnet, so the wallet
   // connects there (aligns wallet balance/simulation with where deposits land).
-  networks: [solanaDevnet /*, solana, ...networkConfig.appKitNetworks */],
+  networks: [solanaDevnet],
   defaultNetwork: solanaDevnet,
   metadata: metadata,
   features: {
@@ -79,25 +75,9 @@ createAppKit({
   },
 })
 
-function Web3Provider({
-  children,
-  cookies,
-}: {
-  children: ReactNode
-  cookies: string | null
-}) {
-  const initialState = cookieToInitialState(
-    wagmiAdapter.wagmiConfig as Config,
-    cookies
-  )
-
+function Web3Provider({ children }: { children: ReactNode }) {
   return (
-    <WagmiProvider
-      config={wagmiAdapter.wagmiConfig as Config}
-      initialState={initialState}
-    >
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </WagmiProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 }
 

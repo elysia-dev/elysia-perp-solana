@@ -47,8 +47,7 @@ const API_URL = "/api" // Proxied through Next.js rewrites
 let loginInFlight = false
 
 export function useAuth() {
-  // Solana hackathon build: identity + signing come from the connected Solana
-  // wallet via Reown AppKit (the EVM/wagmi path is disabled in Web3Provider).
+  // Identity + signing come from the connected Solana wallet via Reown AppKit.
   const account = useAppKitAccount({ namespace: "solana" })
   const address = account.address
   const isConnected = account.isConnected

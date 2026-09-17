@@ -10,7 +10,6 @@ import { RootErrorBoundary } from "@/components/RootErrorBoundary"
 import { SystemHealthGuard } from "@/components/SystemHealthGuard"
 import { Toaster } from "sonner"
 import { ErudaLoader } from "@/components/dev/eruda-loader"
-import { headers } from "next/headers"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -71,14 +70,11 @@ export const viewport: Viewport = {
   themeColor: "#09090b",
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const headersObj = await headers()
-  const cookies = headersObj.get("cookie")
-
   return (
     <html lang="en">
       <head>
@@ -149,7 +145,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <RootErrorBoundary>
-          <Web3Provider cookies={cookies}>
+          <Web3Provider>
             <AuthProvider>
               <WebSocketProvider>
                 <div className="flex h-screen flex-col bg-background">
