@@ -24,10 +24,8 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    // Preserve the query string across the redirect. Marketing links point
-    // at the ROOT with UTM params (`/?utm_source=telegram&…`); dropping
-    // `location.search` here rewrote the URL before gtag captured it, so
-    // every tagged campaign visit was attributed as "(direct)" in GA.
+    // Preserve the query string across the redirect so links that land on the
+    // ROOT with params (`/?ref=…`) carry them through to the trade page.
     router.replace(`/trade/${getLastVisitedMarket()}${window.location.search}`)
   }, [router])
 

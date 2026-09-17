@@ -14,7 +14,6 @@ import {
   useAuthContext,
   clearUserScopedQueries,
 } from "@/lib/providers/AuthProvider"
-import { trackWalletLogin } from "@/lib/analytics/ga"
 import type { LoginRequest, LoginResponse } from "@/types"
 
 // Check if error is user rejection (cancelled signature)
@@ -135,9 +134,6 @@ export function useAuth() {
 
       // 6. Update auth state (cookies already set by server)
       setAuthenticated(true)
-
-      // 7. Analytics: record the wallet login (no-op off prod / without a GA id)
-      trackWalletLogin(address)
 
       return response
     },

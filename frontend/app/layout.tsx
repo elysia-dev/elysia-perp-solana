@@ -10,13 +10,7 @@ import { RootErrorBoundary } from "@/components/RootErrorBoundary"
 import { SystemHealthGuard } from "@/components/SystemHealthGuard"
 import { Toaster } from "sonner"
 import { ErudaLoader } from "@/components/dev/eruda-loader"
-import { GoogleAnalytics } from "@next/third-parties/google"
 import { headers } from "next/headers"
-
-// GA4 measurement id, e.g. "G-XXXXXXXXXX". Set ONLY on the prod deployment so
-// dev / v0 / staging traffic never pollutes the production Analytics property.
-// Absent elsewhere → the <GoogleAnalytics> tag is not rendered (no-op).
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -181,7 +175,6 @@ export default async function RootLayout({
           }
         />
         <ErudaLoader />
-        {GA_MEASUREMENT_ID && <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />}
       </body>
     </html>
   )

@@ -27,7 +27,7 @@ export class RootErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    // Surface to ops / Sentry once wired. For now console is the only sink.
+    // Console is the only sink; wire an error reporter here if one is added.
     console.error("[RootErrorBoundary]", error, info)
   }
 

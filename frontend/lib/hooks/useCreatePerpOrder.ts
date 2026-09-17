@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { apiClient } from "@/lib/api/client"
 import { fetchOpenOrders } from "@/lib/hooks/useOpenPerpOrders"
-import { trackTrade } from "@/lib/analytics/ga"
 import type { PlacePerpOrderRequest, PlacePerpOrderResponse } from "@/types"
 
 export function useCreatePerpOrder() {
@@ -18,14 +17,6 @@ export function useCreatePerpOrder() {
         auth: true,
       }),
     onSuccess: (_, variables) => {
-      trackTrade({
-        market: variables.market,
-        side: variables.side,
-        size: variables.size,
-        price: variables.price,
-        orderType: variables.order_type,
-        reduceOnly: variables.reduce_only,
-      })
       queryClient.invalidateQueries({
         queryKey: ["orderbook", variables.market],
       })
