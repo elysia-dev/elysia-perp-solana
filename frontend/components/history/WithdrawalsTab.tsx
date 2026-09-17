@@ -3,7 +3,7 @@
 import { useRef, useCallback, useEffect } from "react"
 import { Loader2 } from "lucide-react"
 import { formatDate, getAssetName } from "@/lib/utils"
-import { getExplorerTxUrl } from "@/lib/solana/meme"
+import { getExplorerTxUrl } from "@/lib/solana/network"
 import type { Withdrawal, WithdrawalStatus } from "@/types"
 
 interface WithdrawalsTabProps {

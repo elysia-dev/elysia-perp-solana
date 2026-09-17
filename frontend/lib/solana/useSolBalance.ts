@@ -10,7 +10,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { web3 } from "@coral-xyz/anchor"
 import { useAppKitAccount } from "@reown/appkit/react"
-import { MEME_MINT, DEVNET_RPC, getAssociatedTokenAddress } from "./meme"
+import { MEME_MINT, getAssociatedTokenAddress } from "./meme"
+import { SOLANA_RPC } from "./network"
 
 /** Connected wallet's devnet MEME balance (ui amount), or 0 when the wallet
  *  holds none / has no token account yet. */
@@ -21,7 +22,7 @@ export function useSolBalance() {
     enabled: isConnected && !!address,
     refetchInterval: 10_000,
     queryFn: async () => {
-      const connection = new web3.Connection(DEVNET_RPC, "confirmed")
+      const connection = new web3.Connection(SOLANA_RPC, "confirmed")
       const ata = getAssociatedTokenAddress(
         MEME_MINT,
         new web3.PublicKey(address!)

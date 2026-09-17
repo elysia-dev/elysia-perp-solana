@@ -25,12 +25,9 @@ import { useSolBalance } from "@/lib/solana/useSolBalance"
 import { useBalance } from "@/lib/hooks/useBalance"
 import { ACCOUNT_QUERY_KEY } from "@/lib/api/accountQuery"
 import { MEME_ASSET_ID } from "@/lib/solana/meme"
+import { getExplorerTxUrl } from "@/lib/solana/network"
 
 type Phase = "form" | "crediting" | "credited"
-
-function explorerUrl(sig: string) {
-  return `https://explorer.solana.com/tx/${sig}?cluster=devnet`
-}
 
 export function SolanaDepositModal({
   open,
@@ -192,7 +189,7 @@ export function SolanaDepositModal({
             </div>
             {txSig && (
               <a
-                href={explorerUrl(txSig)}
+                href={getExplorerTxUrl(txSig)}
                 target="_blank"
                 rel="noreferrer"
                 className="font-mono text-xs text-[#0086fc] underline"
@@ -227,7 +224,7 @@ export function SolanaDepositModal({
             </div>
             {txSig && (
               <a
-                href={explorerUrl(txSig)}
+                href={getExplorerTxUrl(txSig)}
                 target="_blank"
                 rel="noreferrer"
                 className="font-mono text-xs text-[#0086fc] underline"

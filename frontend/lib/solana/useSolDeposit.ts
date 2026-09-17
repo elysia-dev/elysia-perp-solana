@@ -17,9 +17,9 @@ import {
   MEME_MINT,
   MEME_DECIMALS,
   TOKEN_PROGRAM_ID,
-  DEVNET_RPC,
   getAssociatedTokenAddress,
 } from "./meme"
+import { SOLANA_RPC } from "./network"
 
 const { Connection } = web3
 
@@ -37,7 +37,7 @@ export function useSolDeposit() {
         throw new Error("Amount must be greater than 0")
       }
 
-      const connection = new Connection(DEVNET_RPC, "confirmed")
+      const connection = new Connection(SOLANA_RPC, "confirmed")
       const wallet = {
         publicKey,
         signTransaction: walletProvider.signTransaction.bind(walletProvider),

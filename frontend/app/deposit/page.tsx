@@ -11,6 +11,7 @@ import { PageShell } from "@/components/layout/PageShell"
 import { Button } from "@/components/ui/button"
 import { useAppKit } from "@reown/appkit/react"
 import { useSolDeposit } from "@/lib/solana/useSolDeposit"
+import { getExplorerTxUrl } from "@/lib/solana/network"
 
 function shortSig(sig: string) {
   return `${sig.slice(0, 8)}…${sig.slice(-8)}`
@@ -105,7 +106,7 @@ export default function DepositPage() {
                 Deposit sent
               </span>
               <a
-                href={`https://explorer.solana.com/tx/${txSig}?cluster=devnet`}
+                href={getExplorerTxUrl(txSig)}
                 target="_blank"
                 rel="noreferrer"
                 className="font-mono text-xs text-[#0086fc] underline"

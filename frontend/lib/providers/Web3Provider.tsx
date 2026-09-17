@@ -3,7 +3,7 @@
 import { solanaAdapter } from "@/lib/constants/solana"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { createAppKit } from "@reown/appkit/react"
-import { solanaDevnet } from "@reown/appkit/networks"
+import { SOLANA_NETWORK } from "@/lib/solana/network"
 import { type ReactNode } from "react"
 
 // Reown/WalletConnect project id. Public client identifier (NOT a secret), so
@@ -59,14 +59,13 @@ const metadata = {
 }
 
 // Create the modal (side effect initializes AppKit). Solana-only: the connect
-// modal offers Solana wallets, connected to devnet where the vault program lives.
+// modal offers Solana wallets. Cluster is env-driven (NEXT_PUBLIC_NETWORK):
+// production → mainnet-beta, otherwise devnet — see lib/solana/network.ts.
 createAppKit({
   adapters: [solanaAdapter],
   projectId,
-  // Devnet only: the vault program is deployed on Solana devnet, so the wallet
-  // connects there (aligns wallet balance/simulation with where deposits land).
-  networks: [solanaDevnet],
-  defaultNetwork: solanaDevnet,
+  networks: [SOLANA_NETWORK],
+  defaultNetwork: SOLANA_NETWORK,
   metadata: metadata,
   features: {
     analytics: false,
