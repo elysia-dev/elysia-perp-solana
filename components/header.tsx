@@ -32,11 +32,9 @@ import { SolanaDepositModal } from "@/components/solana-deposit-modal"
 import { SolanaWithdrawModal } from "@/components/solana-withdraw-modal"
 import { MintModal } from "@/components/mint-modal"
 import { AuthModal } from "@/components/auth-modal"
-import { InsuranceLoginModal } from "@/components/modals/InsuranceLoginModal"
 import { DevToolbar } from "@/components/dev/dev-toolbar"
 import { usePendingDepositMonitor } from "@/lib/hooks/usePendingDepositMonitor"
 import { useBalance } from "@/lib/hooks/useBalance"
-import { useAccount } from "@/lib/hooks/useAccount"
 import { isLoggedInCookiePresent } from "@/lib/utils/cookie"
 import { useSelectedPair } from "@/lib/stores"
 import { useDepositWithdrawModal } from "@/lib/stores/useDepositWithdrawModal"
@@ -134,7 +132,6 @@ export function Header() {
     isAuthReady,
     showAuthModal,
     setShowAuthModal,
-    signOut,
   } = useAuth()
   // Shared with the trade panel's Deposit/Withdraw buttons via a store so a
   // single modal instance (below) serves both entry points.
@@ -142,18 +139,6 @@ export function Header() {
   const setDepositOpen = useDepositWithdrawModal((s) => s.setDepositOpen)
   const withdrawOpen = useDepositWithdrawModal((s) => s.withdrawOpen)
   const setWithdrawOpen = useDepositWithdrawModal((s) => s.setWithdrawOpen)
-  const [insuranceLoginOpen, setInsuranceLoginOpen] = useState(false)
-  const [showInsuranceLogin, setShowInsuranceLogin] = useState(false)
-
-  useEffect(() => {
-    setShowInsuranceLogin(localStorage.getItem("@dev") === "insurancefund")
-  }, [])
-
-  // Detect Insurance Fund session via account's zero address
-  const { data: accountData } = useAccount()
-  const isInsuranceFund =
-    accountData?.accounts?.[0]?.l1_address ===
-    "0x0000000000000000000000000000000000000000"
   const selectedPair = useSelectedPair()
   usePendingDepositMonitor()
   const { data: balanceData } = useBalance()
@@ -324,16 +309,6 @@ export function Header() {
           {/* Dev tools (QA-only) */}
           <DevToolbar />
 
-          {showInsuranceLogin && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setInsuranceLoginOpen(true)}
-            >
-              IF Login
-            </Button>
-          )}
-
           {/* Docs link — desktop only; mobile gets its own entry in the
               hamburger menu (different guide URL) */}
           <Button
@@ -364,21 +339,9 @@ export function Header() {
             })}
           >
             {!mounted || !isConnected || !address ? (
-              isInsuranceFund ? (
-                <button
-                  type="button"
-                  onClick={() => signOut()}
-                  className="flex cursor-pointer items-center gap-2 rounded-md border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/20"
-                  title="Click to log out"
-                >
-                  🛡️ Insurance Fund
-                  <LogOut className="h-3 w-3" />
-                </button>
-              ) : (
-                <Button size="sm" variant="outline" onClick={() => open()}>
-                  Connect Wallet
-                </Button>
-              )
+              <Button size="sm" variant="outline" onClick={() => open()}>
+                Connect Wallet
+              </Button>
             ) : (
               <>
                 {SHOW_TEST_UI && evmAddress && (
@@ -541,11 +504,6 @@ export function Header() {
           Deposit/Withdraw modals are not rendered on this Solana-only build. */}
       <SolanaDepositModal open={depositOpen} onOpenChange={setDepositOpen} />
       <SolanaWithdrawModal open={withdrawOpen} onOpenChange={setWithdrawOpen} />
-
-      <InsuranceLoginModal
-        open={insuranceLoginOpen}
-        onOpenChange={setInsuranceLoginOpen}
-      />
 
       <AuthModal
         open={showAuthModal}
