@@ -1,0 +1,84 @@
+import type { NextConfig } from "next"
+
+// Baseline security headers applied to every response.
+//
+// Deliberately NOT setting a Content-Security-Policy here: this is a web3 app
+// with an inline chunk-recovery script (see app/layout.tsx), WalletConnect /
+// Reown AppKit connectors, and cross-origin WebSocket + RPC traffic. A CSP
+// tight enough to matter would need per-request nonces and a full pass against
+// every wallet flow — high risk of silently breaking signing. Tracked as a
+// follow-up; the headers below harden without that risk.
+const SECURITY_HEADERS = [
+  // Clickjacking: never allow this signing UI to be framed by another origin.
+  { key: "X-Frame-Options", value: "DENY" },
+  // Don't let browsers MIME-sniff responses into a different content type.
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  // Send only the origin (no path/query) on cross-origin navigations.
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  // Force HTTPS for 2 years incl. subdomains. Vercel already sets this; being
+  // explicit keeps it correct on any other host too.
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
+  // Drop access to device APIs the app never uses.
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+  },
+]
+
+const nextConfig: NextConfig = {
+  turbopack: {
+    resolveAlias: {
+      // Build-time selection of the network config module. Mainnet builds
+      // (staging/prod, NEXT_PUBLIC_NETWORK=mainnet) bundle ONLY the mainnet
+      // file; every other env bundles ONLY the testnet file. This is what
+      // keeps testnet chain config (Giwa RPC, mock-token addresses, …)
+      // physically OUT of production bundles — a runtime `IS_MAINNET ? A : B`
+      // ternary ships both branches because the bundler can't constant-fold
+      // a cross-module const (verified: giwa strings appeared in mainnet
+      // chunks under the old scheme). Keep in sync with the tsconfig
+      // `@network-config` path, which exists only for type resolution.
+      "@network-config":
+        process.env.NEXT_PUBLIC_NETWORK === "mainnet"
+          ? "./lib/config/network-config.mainnet.ts"
+          : "./lib/config/network-config.testnet.ts",
+    },
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: SECURITY_HEADERS,
+      },
+    ]
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/candle-api/:path*",
+        destination: `${process.env.NEXT_PUBLIC_CANDLE_API_URL || "https://ohlcv-server-dev.up.railway.app"}/:path*`,
+      },
+      // Campaign endpoints can run on a separate backend deployment,
+      // selected per-env via NEXT_PUBLIC_CAMPAIGN_API_URL (dev points it at
+      // elysia-perp-api-dev). Unset → falls back to the main API, identical
+      // to having no rule, so this config is safe on every branch. Must
+      // precede the generic /api rule — rewrites are first-match-wins.
+      {
+        source: "/api/campaigns",
+        destination: `${process.env.NEXT_PUBLIC_CAMPAIGN_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/v1/campaigns`,
+      },
+      {
+        source: "/api/campaigns/:path*",
+        destination: `${process.env.NEXT_PUBLIC_CAMPAIGN_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/v1/campaigns/:path*`,
+      },
+      {
+        source: "/api/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/v1/:path*`,
+      },
+    ]
+  },
+}
+
+export default nextConfig

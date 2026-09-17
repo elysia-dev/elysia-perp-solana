@@ -1,0 +1,35 @@
+/*
+ * Injected into the TradingView charting_library iframe via the widget's
+ * `custom_css_url` option. Recolors everything OUTSIDE the chart pane (top
+ * header, left drawing toolbar, bottom bar, popup menus) to the app's black
+ * (#0a0a0a) — the pane itself is themed through widget `overrides`.
+ * Uses TradingView's documented CSS custom properties.
+ */
+:root {
+  /* Toolbars + chrome around the chart */
+  --tv-color-platform-background: #0a0a0a;
+  --tv-color-pane-background: #0a0a0a;
+
+  /* Toolbar buttons */
+  --tv-color-toolbar-button-background-hover: #1e1e1e;
+  --tv-color-toolbar-button-background-secondary-hover: #1e1e1e;
+  --tv-color-toolbar-button-background-expanded: #1e1e1e;
+  --tv-color-toolbar-button-text: #b2b5be;
+  --tv-color-toolbar-button-text-hover: #e5e5e5;
+
+  /* Opened dropdowns / context menus / dialogs */
+  --tv-color-toolbar-opened-element-background: #141414;
+  --tv-color-popup-background: #141414;
+  --tv-color-popup-element-background-hover: #1e1e1e;
+  --tv-color-popup-element-divider-background: #2a2a2a;
+}
+
+/* The chart page canvas area behind/around panes */
+.chart-page {
+  background-color: #0a0a0a !important;
+}
+
+/* Hide the separator between the toolbar groups (matches waveX's tweak) */
+.separatorWrap-MBOVGQRI {
+  display: none;
+}
