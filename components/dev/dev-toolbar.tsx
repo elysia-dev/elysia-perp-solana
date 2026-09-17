@@ -11,7 +11,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { DevAuthButton } from "@/components/dev/dev-auth-button"
-import { useTradeBot } from "@/lib/hooks/useTradeBot"
 import { useMintToken } from "@/lib/hooks/useMintToken"
 import {
   DEFAULT_MINT_AMOUNT,
@@ -33,7 +32,6 @@ function mintDisabledMessage(reason: string): string {
 export function DevToolbar() {
   const devEnabled = useDevModeStore((s) => s.enabled)
   const [open, setOpen] = useState(false)
-  const { isActive, startBot, stopBot } = useTradeBot()
   const {
     mint,
     isPending: isMinting,
@@ -63,20 +61,6 @@ export function DevToolbar() {
       {open && (
         <div className="flex items-center gap-3 animate-in fade-in slide-in-from-right-2 duration-200">
           <DevAuthButton />
-
-          {/* Bot toggle */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground">
-              Bot
-            </span>
-            <Switch
-              checked={isActive}
-              onCheckedChange={(checked) => {
-                if (checked) startBot()
-                else stopBot()
-              }}
-            />
-          </div>
 
           {/* Data Check toggle */}
           <DataCheckSwitch />
