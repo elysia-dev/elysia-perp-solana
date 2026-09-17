@@ -10,12 +10,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky",
-    "seed:orderbook": "node test/test-script.js orderbook",
-    "seed:liquidation": "node test/test-script.js liquidation",
-    "seed:insurance": "node test/test-script.js insurance",
-    "seed:adl": "node test/test-script.js adl",
-    "seed:funding": "node test/test-script.js funding"
+    "prepare": "husky"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.32.1",

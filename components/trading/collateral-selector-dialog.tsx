@@ -3,8 +3,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Check } from "lucide-react"
-import { useConnection, useReadContract } from "wagmi"
-import { erc20Abi, formatUnits } from "viem"
 import {
   Popover,
   PopoverContent,
@@ -12,16 +10,9 @@ import {
 } from "@/components/ui/popover"
 import { EcosystemLogo } from "@/components/trading/ecosystem-logo"
 import { useMarketStore, useSelectedPair } from "@/lib/stores"
-import { useMintToken } from "@/lib/hooks/useMintToken"
 import { useSolBalance } from "@/lib/solana/useSolBalance"
 import { MEME_ASSET_ID } from "@/lib/solana/meme"
-import {
-  ACTIVE_COLLATERAL_ASSET_IDS,
-  ASSET_ID_TO_CHAIN_ID,
-  CONTRACTS,
-  getTokenAddress,
-} from "@/lib/contracts/addresses"
-import { PRIMARY_CHAIN_ID } from "@/lib/constants/network"
+import { ACTIVE_COLLATERAL_ASSET_IDS } from "@/lib/contracts/addresses"
 import {
   ECOSYSTEMS,
   isPairRoutable,
@@ -30,47 +21,16 @@ import {
 import { tradingToast } from "@/lib/utils/toast"
 
 /**
- * On-chain WALLET balance of an ecosystem's collateral token, read from the
- * chain that actually hosts it (EL → Sepolia, USDC → Giwa Sepolia, …). Each
- * live row reads its own balance — the old single-read-for-current-quote
- * approach couldn't show amounts on the other selectable rows, and read
- * `decimals` from the primary chain even for tokens living elsewhere (which
- * would misformat 6-decimal USDC by ~10^12).
+ * Wallet balance of an ecosystem's collateral token. This Solana build only
+ * surfaces MEME (an SPL token read from the Solana side); every other
+ * ecosystem row is "Soon", so it has no wallet balance to show.
  */
-function useEcoWalletAmount(eco: Ecosystem, enabled: boolean): string | null {
-  // MEME is a Solana SPL token — its wallet balance comes from the Solana
-  // side, not an EVM erc20 read (which would fall back to a Sepolia token).
-  const { data: spyderBalance } = useSolBalance()
-  const { address } = useConnection()
-  const assetId = eco.quoteAssetId
-  const chainId =
-    assetId != null
-      ? (ASSET_ID_TO_CHAIN_ID[assetId] ?? PRIMARY_CHAIN_ID)
-      : PRIMARY_CHAIN_ID
-  const tokenAddress =
-    assetId != null
-      ? (getTokenAddress(chainId, assetId) ??
-        CONTRACTS[chainId]?.collateralToken)
-      : undefined
-  const { decimals } = useMintToken(tokenAddress, chainId)
-  const { data: walletBalance } = useReadContract({
-    address: tokenAddress,
-    abi: erc20Abi,
-    functionName: "balanceOf",
-    args: address ? [address] : undefined,
-    chainId,
-    query: { enabled: enabled && !!address && !!tokenAddress },
-  })
-  if (assetId === MEME_ASSET_ID) {
-    return spyderBalance != null
-      ? spyderBalance.toLocaleString("en-US", { maximumFractionDigits: 2 })
-      : null
-  }
-  if (walletBalance == null) return null
-  return parseFloat(formatUnits(walletBalance, decimals ?? 18)).toLocaleString(
-    "en-US",
-    { maximumFractionDigits: 2 }
-  )
+function useEcoWalletAmount(eco: Ecosystem): string | null {
+  const { data: memeBalance } = useSolBalance()
+  if (eco.quoteAssetId !== MEME_ASSET_ID) return null
+  return memeBalance != null
+    ? memeBalance.toLocaleString("en-US", { maximumFractionDigits: 2 })
+    : null
 }
 
 interface Props {
@@ -200,8 +160,7 @@ function CollateralRow({
   isLive: boolean
   onSelect: () => void
 }) {
-  // Read only for rows the user can actually act on; "Soon" rows skip the RPC.
-  const amount = useEcoWalletAmount(eco, isCurrent || isLive)
+  const amount = useEcoWalletAmount(eco)
   return (
     <li>
       <button

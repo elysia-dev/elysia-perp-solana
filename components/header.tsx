@@ -2,9 +2,6 @@
 
 import { Fragment, useEffect, useMemo, useRef, useState } from "react"
 import { useAppKit, useAppKitAccount, useDisconnect } from "@reown/appkit/react"
-// EVM (wagmi) address is read only to gate the dormant EVM-only widgets
-// (Mint / Deposit / Withdraw modals); connection identity is Solana.
-import { useConnection } from "wagmi"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -15,12 +12,6 @@ import {
   PopoverContent,
 } from "@/components/ui/popover"
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import {
   ArrowDownToLine,
   ArrowUpFromLine,
   ArrowUpRight,
@@ -30,7 +21,6 @@ import { useAuth } from "@/lib/hooks/useAuth"
 import { useSolBalance } from "@/lib/solana/useSolBalance"
 import { SolanaDepositModal } from "@/components/solana-deposit-modal"
 import { SolanaWithdrawModal } from "@/components/solana-withdraw-modal"
-import { MintModal } from "@/components/mint-modal"
 import { AuthModal } from "@/components/auth-modal"
 import { DevToolbar } from "@/components/dev/dev-toolbar"
 import { usePendingDepositMonitor } from "@/lib/hooks/usePendingDepositMonitor"
@@ -38,34 +28,7 @@ import { useBalance } from "@/lib/hooks/useBalance"
 import { isLoggedInCookiePresent } from "@/lib/utils/cookie"
 import { useSelectedPair } from "@/lib/stores"
 import { useDepositWithdrawModal } from "@/lib/stores/useDepositWithdrawModal"
-import { SHOW_TEST_UI } from "@/lib/constants/network"
 import { formatAddress } from "@/lib/utils"
-
-function MintButton({ address }: { address: `0x${string}` }) {
-  const [mintOpen, setMintOpen] = useState(false)
-  return (
-    <>
-      <TooltipProvider delayDuration={200}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="sm"
-              variant="outline"
-              className="mr-[10px]"
-              onClick={() => setMintOpen(true)}
-            >
-              Mint
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            <p>Mint test tokens (EL / USDT)</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      <MintModal open={mintOpen} onOpenChange={setMintOpen} address={address} />
-    </>
-  )
-}
 
 /** Book icon for the Guide button (design asset guide_icon.svg, recolored
  *  to currentColor so it follows the button's text color). */
@@ -116,9 +79,6 @@ export function Header() {
   const status: "connected" | "disconnected" = isConnected
     ? "connected"
     : "disconnected"
-  // EVM address (empty on this branch — EVM adapter disabled) drives the
-  // dormant ERC20 balance/mint widgets only, never the connection state.
-  const { address: evmAddress } = useConnection()
   const pathname = usePathname()
   const { open } = useAppKit()
   const { disconnect } = useDisconnect()
@@ -344,9 +304,6 @@ export function Header() {
               </Button>
             ) : (
               <>
-                {SHOW_TEST_UI && evmAddress && (
-                  <MintButton address={evmAddress as `0x${string}`} />
-                )}
                 <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button size="sm" variant="outline" disabled={isLoggingIn}>
