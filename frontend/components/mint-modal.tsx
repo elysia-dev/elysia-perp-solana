@@ -21,6 +21,7 @@ import {
   useFaucetClaim,
   faucetUiAmount,
 } from "@/lib/hooks/useFaucet"
+import { useSolNativeBalance } from "@/lib/solana/useSolBalance"
 import { ApiError } from "@/lib/api/client"
 
 function formatCooldown(seconds: number): string {
@@ -41,7 +42,13 @@ export function MintModal({
 }) {
   const { isAuthenticated } = useAuthContext()
   const { data: status, error: statusError } = useFaucetStatus()
+  const { data: solBalance } = useSolNativeBalance()
   const claim = useFaucetClaim()
+
+  // A claim creates the recipient MEME token account (rent) and needs the wallet
+  // to hold some native SOL — with zero SOL the on-chain claim can't settle, so
+  // block it up front. Only gate once the balance is actually known.
+  const noSol = isAuthenticated && solBalance != null && solBalance <= 0
 
   const amountLabel = status
     ? faucetUiAmount(status.amount).toLocaleString("en-US")
@@ -107,6 +114,7 @@ export function MintModal({
                 !isAuthenticated ||
                 faucetUnavailable ||
                 onCooldown ||
+                noSol ||
                 claim.isPending
               }
               className="w-full"
@@ -119,7 +127,9 @@ export function MintModal({
                     ? "Faucet unavailable"
                     : onCooldown
                       ? `Available in ${formatCooldown(cooldownLeft)}`
-                      : `Claim ${amountLabel} MEME`}
+                      : noSol
+                        ? "Need SOL for fees"
+                        : `Claim ${amountLabel} MEME`}
             </Button>
 
             {!isAuthenticated && (
@@ -132,6 +142,13 @@ export function MintModal({
             {faucetUnavailable && (
               <p className="text-[11px] text-muted-foreground/70">
                 The faucet isn&apos;t enabled on this network.
+              </p>
+            )}
+
+            {noSol && (
+              <p className="text-[11px] text-muted-foreground/70">
+                Your wallet has no SOL. Fund it with a little SOL first — the
+                claim needs it for the token-account rent and fees.
               </p>
             )}
 

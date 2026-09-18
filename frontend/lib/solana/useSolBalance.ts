@@ -37,3 +37,23 @@ export function useSolBalance() {
     },
   })
 }
+
+/** Connected wallet's native SOL balance (in SOL). Used to gate actions that
+ *  need the user to cover fees / token-account rent (e.g. the faucet claim). */
+export function useSolNativeBalance() {
+  const { address, isConnected } = useAppKitAccount({ namespace: "solana" })
+  return useQuery({
+    queryKey: ["sol-native-balance", address],
+    enabled: isConnected && !!address,
+    refetchInterval: 10_000,
+    queryFn: async () => {
+      const connection = new web3.Connection(SOLANA_RPC, "confirmed")
+      try {
+        const lamports = await connection.getBalance(new web3.PublicKey(address!))
+        return lamports / web3.LAMPORTS_PER_SOL
+      } catch {
+        return 0
+      }
+    },
+  })
+}
