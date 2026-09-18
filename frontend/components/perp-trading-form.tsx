@@ -104,14 +104,6 @@ export function PerpTradingForm() {
 
   const priceMaxIntDigits = useMemo(() => 10 - quoteDecimals, [quoteDecimals])
 
-  // Extensible size unit options — "base" is always the internal unit
-  const sizeUnitOptions = useMemo(
-    () => [
-      { value: "base", label: baseCurrency },
-      { value: "quote", label: quoteCurrency },
-    ],
-    [baseCurrency, quoteCurrency]
-  )
 
   // Trading form store
   const side = useTradingFormStore((s) => s.side)
@@ -600,7 +592,10 @@ export function PerpTradingForm() {
   // …): users think in "how much money am I putting in", not in BTC units.
   // "base" stays the internal order unit — the quote input is converted before
   // submit — and remains selectable in the dropdown.
-  const [sizeUnit, setSizeUnit] = useState("quote")
+  // Fixed to the quote collateral (MEME$) — the token picker was removed so the
+  // base (US500) unit can no longer be selected. Typed as string so the
+  // existing base/quote branches still type-check.
+  const sizeUnit: string = "quote"
   const [quoteInput, setQuoteInput] = useState("")
   const quoteInputRef = useRef(false) // true while user is typing in non-base mode
 
@@ -906,33 +901,10 @@ export function PerpTradingForm() {
               }}
               className="pr-24 font-mono max-md:h-8 max-md:text-sm"
             />
+            {/* Size unit is fixed to the quote collateral (MEME$) — no token
+                picker, so the base (US500) unit can't be selected. */}
             <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
-              <select
-                value={sizeUnit}
-                onChange={(e) => {
-                  const next = e.target.value
-                  if (next === "base" && sizeUnit !== "base") {
-                    const quoteValue = Number.parseFloat(quoteInput || "0")
-                    const minQuoteAmount =
-                      displayPrice / (pair.base_scale_k || 100000)
-                    if (quoteValue > 0 && quoteValue < minQuoteAmount) {
-                      handleAmountChange("")
-                    }
-                  } else if (next !== "base" && sizeUnit === "base") {
-                    if (amount) {
-                      syncQuoteInput(amount)
-                    }
-                  }
-                  setSizeUnit(next)
-                }}
-                className="cursor-pointer bg-transparent text-xs text-muted-foreground outline-none"
-              >
-                {sizeUnitOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              <span className="text-xs text-muted-foreground">{pair.quote}</span>
             </div>
           </div>
           {/* Min order-value hint — backend rejects notional below $1.
