@@ -155,10 +155,17 @@ export function useMarkPriceSync() {
           useMarketModeStore.getState().setMode(marketId, stats.market_mode)
         }
 
-        const divisor = Math.pow(10, priceDecimals)
-        const markPrice = stats.mark_price / divisor
-        const indexPrice = stats.index_price / divisor
         const symbol = info?.symbol ?? stats.market
+
+        const divisor = Math.pow(10, priceDecimals)
+        // Backend oracle scale workaround (SPY-PERP-MEME): the oracle mark/index
+        // arrive 10x too high versus the actual SPY price and the trade/candle
+        // feed, which would also blow up PnL against ~763-level entry prices.
+        // Correct on the client until the backend fixes the oracle scale.
+        // Applied to price fields only — NOT open interest (a size, not a price).
+        const oracleScaleFix = stats.market === "SPY-PERP-MEME" ? 10 : 1
+        const markPrice = stats.mark_price / divisor / oracleScaleFix
+        const indexPrice = stats.index_price / divisor / oracleScaleFix
 
         const openInterest = stats.open_interest / divisor
         const dailyQuoteVolume = stats.daily_quote_token_volume ?? 0
