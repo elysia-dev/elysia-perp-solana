@@ -25,7 +25,7 @@ import { useSolBalance } from "@/lib/solana/useSolBalance"
 import { useBalance } from "@/lib/hooks/useBalance"
 import { ACCOUNT_QUERY_KEY } from "@/lib/api/accountQuery"
 import { MEME_ASSET_ID } from "@/lib/solana/meme"
-import { getExplorerTxUrl } from "@/lib/solana/network"
+import { getExplorerTxUrl, NETWORK_LABEL, IS_MAINNET } from "@/lib/solana/network"
 
 type Phase = "form" | "crediting" | "credited"
 
@@ -110,12 +110,12 @@ export function SolanaDepositModal({
           <DialogTitle className="flex items-center gap-2">
             Deposit MEME
             <span className="rounded bg-[#0086fc]/15 px-1.5 py-0.5 text-[10px] font-medium text-[#0086fc]">
-              devnet
+              {NETWORK_LABEL}
             </span>
           </DialogTitle>
           <DialogDescription>
-            Deposit MEME into the Elysia vault on Solana devnet. Your wallet
-            signs the transaction.
+            Deposit MEME into the Elysia vault on Solana{IS_MAINNET ? "" : " devnet"}.
+            Your wallet signs the transaction.
           </DialogDescription>
         </DialogHeader>
 

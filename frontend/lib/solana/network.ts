@@ -21,6 +21,9 @@ export const IS_MAINNET =
 /** AppKit network object for the connect modal + the wallet's selected cluster. */
 export const SOLANA_NETWORK: AppKitNetwork = IS_MAINNET ? solana : solanaDevnet
 
+/** Short cluster label for UI badges — "Solana" on mainnet, "devnet" otherwise. */
+export const NETWORK_LABEL = IS_MAINNET ? "Solana" : "devnet"
+
 /** RPC endpoint for balance reads and deposit tx sends. Override per env. */
 export const SOLANA_RPC =
   process.env.NEXT_PUBLIC_SOLANA_RPC_URL ||

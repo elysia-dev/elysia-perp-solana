@@ -23,6 +23,7 @@ import { useBalance } from "@/lib/hooks/useBalance"
 import { useWithdraw } from "@/lib/hooks/useWithdraw"
 import { useAuthContext } from "@/lib/providers/AuthProvider"
 import { MEME_ASSET_ID } from "@/lib/solana/meme"
+import { NETWORK_LABEL } from "@/lib/solana/network"
 
 export function SolanaWithdrawModal({
   open,
@@ -75,7 +76,7 @@ export function SolanaWithdrawModal({
           <DialogTitle className="flex items-center gap-2">
             Withdraw MEME
             <span className="rounded bg-[#0086fc]/15 px-1.5 py-0.5 text-[10px] font-medium text-[#0086fc]">
-              devnet
+              {NETWORK_LABEL}
             </span>
           </DialogTitle>
           <DialogDescription>
