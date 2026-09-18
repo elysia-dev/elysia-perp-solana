@@ -43,6 +43,13 @@ const nextConfig: NextConfig = {
         source: "/candle-api/:path*",
         destination: `${process.env.NEXT_PUBLIC_CANDLE_API_URL || "https://ohlcv-server-dev.up.railway.app"}/:path*`,
       },
+      // Faucet lives on a SEPARATE, engine-independent API server (not the perp
+      // engine at NEXT_PUBLIC_API_URL). Proxied same-origin so the session
+      // cookie is forwarded on the authenticated /faucet + /faucet/claim calls.
+      {
+        source: "/api-server/:path*",
+        destination: `${process.env.NEXT_PUBLIC_API_SERVER_URL || "https://api-server-testnet.up.railway.app"}/api/v1/:path*`,
+      },
       // Campaign endpoints can run on a separate backend deployment,
       // selected per-env via NEXT_PUBLIC_CAMPAIGN_API_URL (dev points it at
       // elysia-perp-api-dev). Unset → falls back to the main API, identical

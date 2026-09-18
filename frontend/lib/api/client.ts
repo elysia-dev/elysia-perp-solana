@@ -46,6 +46,10 @@ interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE"
   body?: unknown
   auth?: boolean // Include credentials for authenticated endpoints
+  // Override the base path for THIS request only (e.g. the faucet lives on a
+  // separate API server proxied at "/api-server"). The auth-refresh call always
+  // stays on the main "/api" — the session cookie is shared across both.
+  basePath?: string
 }
 
 // Shared refresh promise - all 401 requests wait on the same promise
@@ -167,7 +171,7 @@ export async function apiClient<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { method = "GET", body, auth = false } = options
+  const { method = "GET", body, auth = false, basePath = API_URL } = options
 
   const config: RequestInit = {
     method,
@@ -188,7 +192,7 @@ export async function apiClient<T>(
 
   let response: Response
   try {
-    response = await fetch(`${API_URL}${endpoint}`, config)
+    response = await fetch(`${basePath}${endpoint}`, config)
   } catch (err) {
     // Network error — treat as a backend availability failure
     if (trackHealth) useSystemHealthStore.getState().recordFailure()
@@ -207,7 +211,7 @@ export async function apiClient<T>(
     if (refreshResult.success) {
       // Retry original request
       try {
-        response = await fetch(`${API_URL}${endpoint}`, config)
+        response = await fetch(`${basePath}${endpoint}`, config)
       } catch (err) {
         if (trackHealth) useSystemHealthStore.getState().recordFailure()
         throw err

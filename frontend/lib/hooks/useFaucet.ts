@@ -31,6 +31,10 @@ export interface FaucetClaimResult {
 
 export const FAUCET_QUERY_KEY = ["faucet"] as const
 
+// Faucet runs on a separate API server, proxied same-origin via the
+// "/api-server" rewrite (see next.config.ts) so the auth cookie is forwarded.
+const FAUCET_BASE = "/api-server"
+
 /** base-unit string → UI MEME amount. */
 export function faucetUiAmount(baseUnits: string | undefined): number {
   const n = Number(baseUnits)
@@ -45,7 +49,8 @@ export function useFaucetStatus() {
   return useQuery<FaucetStatus>({
     queryKey: FAUCET_QUERY_KEY,
     enabled: isAuthenticated,
-    queryFn: () => apiClient<FaucetStatus>("/faucet", { auth: true }),
+    queryFn: () =>
+      apiClient<FaucetStatus>("/faucet", { auth: true, basePath: FAUCET_BASE }),
     refetchInterval: 30_000,
     retry: false,
   })
@@ -60,6 +65,7 @@ export function useFaucetClaim() {
       apiClient<FaucetClaimResult>("/faucet/claim", {
         method: "POST",
         auth: true,
+        basePath: FAUCET_BASE,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ACCOUNT_QUERY_KEY })
