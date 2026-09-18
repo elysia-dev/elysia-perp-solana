@@ -93,11 +93,19 @@ export function AdvancedChart({ indexToken, className }: Props) {
         horzLines: { color: "rgba(255,255,255,0.07)" },
       },
       crosshair: { mode: CrosshairMode.Normal },
-      rightPriceScale: { borderColor: "rgba(255,255,255,0.12)" },
+      rightPriceScale: {
+        borderColor: "rgba(255,255,255,0.12)",
+        // Reserve the bottom ~26% for the volume pane so candles never draw
+        // over the volume bars (volume uses the bottom 20%).
+        scaleMargins: { top: 0.08, bottom: 0.26 },
+      },
       timeScale: {
         borderColor: "rgba(255,255,255,0.12)",
         timeVisible: true,
         secondsVisible: false,
+        // Narrower bars = zoomed-out view (fitContent made few bars look fat).
+        barSpacing: 9,
+        rightOffset: 4,
       },
     })
     chartRef.current = chart
@@ -188,7 +196,9 @@ export function AdvancedChart({ indexToken, className }: Props) {
         }))
       )
       volume.setData(bars.map(applyVolume))
-      chartRef.current?.timeScale().fitContent()
+      // Keep the configured barSpacing (zoom level) and anchor to the latest
+      // bar, instead of fitContent() which stretches all bars to fill the width.
+      chartRef.current?.timeScale().scrollToRealTime()
     }
 
     load()
