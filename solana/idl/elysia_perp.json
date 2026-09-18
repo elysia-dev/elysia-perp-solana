@@ -1,0 +1,2157 @@
+{
+  "address": "6Q6A6yRtTh9EyANQdcFqXUn9zBCgMayyvTojnC2cRFWy",
+  "metadata": {
+    "name": "elysia_perp",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "accept_ownership",
+      "discriminator": [
+        172,
+        23,
+        43,
+        13,
+        238,
+        213,
+        85,
+        150
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_owner",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "add_native_token",
+      "docs": [
+        "The native-SOL counterpart of [`add_token`]: the sentinel config plus the",
+        "lamport vault.",
+        "",
+        "The vault must be created and owned by THIS program, not left as an",
+        "unopened system-owned address. A program may only debit accounts it owns,",
+        "so a system-owned PDA could take deposits and never pay them out."
+      ],
+      "discriminator": [
+        105,
+        26,
+        39,
+        131,
+        139,
+        50,
+        89,
+        93
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "sol_vault",
+          "docs": [
+            "program so that `withdraw_sol` is able to debit it at all."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "add_token",
+      "docs": [
+        "Create or re-enable a token's config, and with it the vault that token",
+        "will be paid into. One account carries support, the minimum and the",
+        "withdrawal cap -- where the Solidity contract's three parallel",
+        "`mapping(address token => ...)` collapse to.",
+        "",
+        "The vault is created HERE rather than on first deposit. A token account",
+        "at a PDA can only be created by this program signing for it, so leaving",
+        "it to the depositor would mean either an instruction anyone may call to",
+        "conjure vaults, or a first deposit that fails for reasons the depositor",
+        "cannot fix."
+      ],
+      "discriminator": [
+        237,
+        255,
+        26,
+        54,
+        56,
+        48,
+        68,
+        52
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "deposit",
+      "docs": [
+        "Move SPL tokens into the vault and credit `credit_to` off-chain.",
+        "",
+        "`credit_to` is a Solana pubkey — pass the depositor's own key unless",
+        "depositing on another wallet's behalf.",
+        "",
+        "`amount` is what we ASK the token program to move; `received` is what the",
+        "vault balance actually grew by, and only `received` is emitted or checked",
+        "against the minimum. The Solidity contract measures the same delta for",
+        "fee-on-transfer ERC20s, and the concern is sharper here: Token-2022 makes",
+        "transfer fees a first-class mint extension rather than an oddity."
+      ],
+      "discriminator": [
+        242,
+        35,
+        198,
+        137,
+        82,
+        225,
+        242,
+        182
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "depositor_token_account",
+          "writable": true
+        },
+        {
+          "name": "depositor",
+          "signer": true
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "route_type",
+          "type": {
+            "defined": {
+              "name": "RouteType"
+            }
+          }
+        },
+        {
+          "name": "credit_to",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "deposit_sol",
+      "docs": [
+        "Native-SOL deposit. The lamports land in a PDA that holds nothing else,",
+        "so the vault's balance is the deposits plus its rent-exempt minimum --",
+        "a floor with no EVM counterpart, and the reason [`withdraw_sol`] refuses",
+        "to spend below it."
+      ],
+      "discriminator": [
+        108,
+        81,
+        78,
+        117,
+        125,
+        155,
+        56,
+        200
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "sol_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "depositor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "route_type",
+          "type": {
+            "defined": {
+              "name": "RouteType"
+            }
+          }
+        },
+        {
+          "name": "credit_to",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "Create the vault config. Mirrors `initialize(address initialOwner)`,",
+        "including its choice to default `withdrawer` to the owner so a fresh",
+        "deployment can withdraw before the roles are split.",
+        "",
+        "Only the program's UPGRADE AUTHORITY may call it. `config` is a PDA with",
+        "fixed seeds, so it can be created exactly once, and whoever creates it",
+        "becomes owner and withdrawer. Left open, anyone watching for the deploy",
+        "could initialize first and own the vault; the deploy and `init` are",
+        "separate transactions, so that window always exists. The ProgramData",
+        "account is the one on-chain record of who deployed this program, which",
+        "makes it the natural gate: nobody else can hold that key, and the",
+        "deployer is already trusted with everything the owner can do."
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "program_data",
+          "docs": [
+            "THIS program's ProgramData, pinned by address: the loader derives it from",
+            "the program id. The type alone only proves it is SOME program's",
+            "ProgramData, and one from a program the caller deployed would name the",
+            "caller as its upgrade authority."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  80,
+                  52,
+                  159,
+                  204,
+                  227,
+                  236,
+                  72,
+                  132,
+                  175,
+                  126,
+                  35,
+                  73,
+                  211,
+                  108,
+                  210,
+                  150,
+                  201,
+                  33,
+                  49,
+                  168,
+                  243,
+                  232,
+                  117,
+                  46,
+                  146,
+                  131,
+                  178,
+                  152,
+                  208,
+                  170,
+                  180,
+                  146
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                2,
+                168,
+                246,
+                145,
+                78,
+                136,
+                161,
+                176,
+                226,
+                16,
+                21,
+                62,
+                247,
+                99,
+                174,
+                43,
+                0,
+                194,
+                185,
+                61,
+                22,
+                193,
+                36,
+                210,
+                192,
+                83,
+                122,
+                16,
+                4,
+                128,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "pause",
+      "docs": [
+        "Pause deposits and withdrawals. Guardian OR owner, for fast incident",
+        "response. Unpausing is owner-only, so a compromised guardian can stop the",
+        "vault but never restart it."
+      ],
+      "discriminator": [
+        211,
+        22,
+        221,
+        251,
+        74,
+        121,
+        193,
+        47
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "remove_token",
+      "docs": [
+        "Stop accepting deposits of a token. Does NOT block withdrawals: funds",
+        "already in the vault must still be payable out, exactly as removing a",
+        "token on L1 leaves `withdraw` working."
+      ],
+      "discriminator": [
+        149,
+        134,
+        57,
+        61,
+        136,
+        2,
+        144,
+        145
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "mint",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_guardian",
+      "docs": [
+        "Appoint or clear the guardian. No zero-check: the default pubkey is a",
+        "valid \"no guardian\" state, and clearing it bricks nothing because the",
+        "owner can always pause."
+      ],
+      "discriminator": [
+        147,
+        243,
+        50,
+        121,
+        154,
+        164,
+        50,
+        30
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_guardian",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_min_deposit",
+      "discriminator": [
+        15,
+        182,
+        74,
+        248,
+        251,
+        148,
+        186,
+        171
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "min_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_withdraw_limit",
+      "docs": [
+        "Configure the rolling-window cap. `cap == 0` removes the limit.",
+        "",
+        "Reconfiguring CARRIES the usage forward rather than zeroing it. L1 resets",
+        "the window here, which means any cap change -- even re-submitting the",
+        "same cap -- refills the bucket: drain it, reconfigure, drain it again.",
+        "The usage is first settled under the OLD rate as of now, then clamped to",
+        "the new cap, so lowering the cap below what was just withdrawn leaves the",
+        "bucket empty rather than negative.",
+        "",
+        "`cap == 0` is the exception, on purpose: it means usage is not managed at",
+        "all. Nothing is recorded while it holds, so setting a cap afterwards",
+        "starts from an empty bucket."
+      ],
+      "discriminator": [
+        198,
+        158,
+        141,
+        22,
+        248,
+        120,
+        105,
+        42
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "cap",
+          "type": "u64"
+        },
+        {
+          "name": "window_seconds",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_withdrawer",
+      "discriminator": [
+        153,
+        183,
+        217,
+        79,
+        222,
+        182,
+        73,
+        207
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_withdrawer",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "transfer_ownership",
+      "docs": [
+        "Two-step ownership handover (`Ownable2Step`): nominate here, and the",
+        "nominee must accept. One step would let a typo strand the vault with an",
+        "owner nobody holds the key for -- and here that key is also the one that",
+        "appoints the withdrawer."
+      ],
+      "discriminator": [
+        65,
+        177,
+        215,
+        73,
+        53,
+        45,
+        99,
+        47
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "unpause",
+      "discriminator": [
+        169,
+        144,
+        4,
+        38,
+        10,
+        141,
+        188,
+        255
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdraw",
+      "docs": [
+        "Pay SPL tokens out. Restricted to `withdrawer`, never `owner`: the key",
+        "that signs withdrawals all day is deliberately not the key that can",
+        "upgrade the program or change its config."
+      ],
+      "discriminator": [
+        183,
+        18,
+        70,
+        156,
+        148,
+        109,
+        161,
+        34
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "recipient_token_account",
+          "writable": true
+        },
+        {
+          "name": "withdrawer",
+          "signer": true
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "withdrawal_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdraw_sol",
+      "docs": [
+        "Native-SOL withdrawal. Moves lamports by direct assignment rather than a",
+        "system transfer, because the source is program-owned; the rent-exempt",
+        "floor is enforced explicitly since nothing else would."
+      ],
+      "discriminator": [
+        145,
+        131,
+        74,
+        136,
+        65,
+        137,
+        42,
+        38
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              },
+              {
+                "kind": "const",
+                "value": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "sol_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "recipient",
+          "docs": [
+            "same latitude `withdraw(address user, ...)` has on L1."
+          ],
+          "writable": true
+        },
+        {
+          "name": "withdrawer",
+          "signer": true
+        },
+        {
+          "name": "event_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  95,
+                  95,
+                  101,
+                  118,
+                  101,
+                  110,
+                  116,
+                  95,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "program"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "withdrawal_id",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Config",
+      "discriminator": [
+        155,
+        12,
+        170,
+        224,
+        30,
+        250,
+        204,
+        130
+      ]
+    },
+    {
+      "name": "TokenConfig",
+      "discriminator": [
+        92,
+        73,
+        255,
+        43,
+        107,
+        51,
+        117,
+        101
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "DepositEvent",
+      "discriminator": [
+        120,
+        248,
+        61,
+        83,
+        31,
+        142,
+        107,
+        144
+      ]
+    },
+    {
+      "name": "GuardianUpdated",
+      "discriminator": [
+        31,
+        95,
+        81,
+        24,
+        90,
+        9,
+        246,
+        32
+      ]
+    },
+    {
+      "name": "MinDepositUpdated",
+      "discriminator": [
+        25,
+        23,
+        150,
+        164,
+        135,
+        162,
+        172,
+        163
+      ]
+    },
+    {
+      "name": "OwnershipTransferStarted",
+      "discriminator": [
+        183,
+        253,
+        239,
+        246,
+        140,
+        179,
+        133,
+        105
+      ]
+    },
+    {
+      "name": "OwnershipTransferred",
+      "discriminator": [
+        172,
+        61,
+        205,
+        183,
+        250,
+        50,
+        38,
+        98
+      ]
+    },
+    {
+      "name": "PauseUpdated",
+      "discriminator": [
+        203,
+        203,
+        33,
+        225,
+        130,
+        103,
+        90,
+        105
+      ]
+    },
+    {
+      "name": "TokenAdded",
+      "discriminator": [
+        192,
+        251,
+        41,
+        21,
+        114,
+        133,
+        163,
+        47
+      ]
+    },
+    {
+      "name": "TokenRemoved",
+      "discriminator": [
+        94,
+        118,
+        141,
+        122,
+        52,
+        69,
+        100,
+        239
+      ]
+    },
+    {
+      "name": "WithdrawEvent",
+      "discriminator": [
+        22,
+        9,
+        133,
+        26,
+        160,
+        44,
+        71,
+        192
+      ]
+    },
+    {
+      "name": "WithdrawLimitUpdated",
+      "discriminator": [
+        165,
+        111,
+        166,
+        59,
+        117,
+        96,
+        22,
+        34
+      ]
+    },
+    {
+      "name": "WithdrawerUpdated",
+      "discriminator": [
+        196,
+        48,
+        97,
+        133,
+        244,
+        81,
+        185,
+        152
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "UnsupportedToken",
+      "msg": "Token is not supported"
+    },
+    {
+      "code": 6001,
+      "name": "ZeroAmount",
+      "msg": "Amount must be non-zero"
+    },
+    {
+      "code": 6002,
+      "name": "ZeroAddress",
+      "msg": "Address must be non-zero"
+    },
+    {
+      "code": 6003,
+      "name": "NotWithdrawer",
+      "msg": "Signer is not the withdrawer"
+    },
+    {
+      "code": 6004,
+      "name": "NotOwner",
+      "msg": "Signer is not the owner"
+    },
+    {
+      "code": 6005,
+      "name": "NotPendingOwner",
+      "msg": "Signer is not the pending owner"
+    },
+    {
+      "code": 6006,
+      "name": "NotGuardianOrOwner",
+      "msg": "Signer is neither guardian nor owner"
+    },
+    {
+      "code": 6007,
+      "name": "WithdrawCapExceeded",
+      "msg": "Withdrawal exceeds the rolling-window cap"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidWithdrawLimit",
+      "msg": "A non-zero cap requires a non-zero window"
+    },
+    {
+      "code": 6009,
+      "name": "DepositBelowMinimum",
+      "msg": "Deposit is below the token's minimum"
+    },
+    {
+      "code": 6010,
+      "name": "InsufficientVaultBalance",
+      "msg": "Vault cannot pay out below its rent-exempt minimum"
+    },
+    {
+      "code": 6011,
+      "name": "Paused",
+      "msg": "Vault is paused"
+    },
+    {
+      "code": 6012,
+      "name": "UnsafeMintExtension",
+      "msg": "Only classic SPL Token mints can be custodied (Token-2022 is refused)"
+    },
+    {
+      "code": 6013,
+      "name": "NotUpgradeAuthority",
+      "msg": "Signer is not the program's upgrade authority"
+    }
+  ],
+  "types": [
+    {
+      "name": "Config",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "pending_owner",
+            "docs": [
+              "Nominated owner awaiting `accept_ownership`; default = none pending."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "withdrawer",
+            "docs": [
+              "The only key allowed to withdraw."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "guardian",
+            "docs": [
+              "May pause but never unpause. Default = unset."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DepositEvent",
+      "docs": [
+        "Deposits and withdrawals go out with `emit_cpi!`, not `emit!`.",
+        "",
+        "`emit!` writes to the transaction log, and logs are truncated by validators",
+        "and dropped by RPC providers under load. Our entire deposit accounting is",
+        "\"the indexer saw the event\", so a lost Deposit is a user's money not",
+        "credited. `emit_cpi!` self-invokes the program so the payload lands in",
+        "INSTRUCTION DATA, which is part of the transaction and always retrievable.",
+        "",
+        "Admin events below stay on `emit!`: losing one costs an operator a log line,",
+        "not a user their balance."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "credit_to",
+            "docs": [
+              "The Solana pubkey credited in our ledger. Resolved through the account's",
+              "linked credentials; an unlinked key gets an account of its own.",
+              "",
+              "Usually equal to `depositor`. It is a separate field so a deposit can be",
+              "made on another wallet's behalf, which is the analogue of the Solidity",
+              "contract's `depositTo`."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "depositor",
+            "docs": [
+              "Who actually paid, kept for support and forensics only."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "docs": [
+              "[`NATIVE_MINT_SENTINEL`] for SOL."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "docs": [
+              "What the vault actually received, after any transfer fee."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "route_type",
+            "type": {
+              "defined": {
+                "name": "RouteType"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GuardianUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "previous",
+            "type": "pubkey"
+          },
+          {
+            "name": "current",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MinDepositUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous",
+            "type": "u64"
+          },
+          {
+            "name": "current",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OwnershipTransferStarted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "current",
+            "type": "pubkey"
+          },
+          {
+            "name": "pending",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OwnershipTransferred",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "previous",
+            "type": "pubkey"
+          },
+          {
+            "name": "current",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PauseUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "paused",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RouteType",
+      "docs": [
+        "Which book the credited balance lands in, mirroring the Solidity enum's",
+        "ordering so the two chains' events decode to the same values."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Perp"
+          },
+          {
+            "name": "Spot"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenAdded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "docs": [
+              "The SPL mint, or [`NATIVE_MINT_SENTINEL`] for native SOL."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "supported",
+            "type": "bool"
+          },
+          {
+            "name": "min_deposit",
+            "docs": [
+              "In the token's own base units. `0` = no floor."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "cap",
+            "docs": [
+              "Leaky-bucket capacity. `0` = unlimited, and usage is not tracked."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "window_seconds",
+            "docs": [
+              "Seconds for a full refill."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "window_start",
+            "docs": [
+              "Unix seconds of the last withdrawal."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "withdrawn_in_window",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenRemoved",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "withdrawal_id",
+            "docs": [
+              "The submitter's own row id for this payout, echoed back so the ledger and",
+              "the chain can be reconciled exactly.",
+              "",
+              "Without it the two share only `(mint, amount)`, which cannot distinguish",
+              "two equal payouts to the same token -- and on L1 there is no equivalent",
+              "problem, because `Withdraw(user, ...)` names the payee EOA and the EOA IS",
+              "the ledger key. Here `recipient` is a token-account pubkey the ledger",
+              "cannot represent.",
+              "",
+              "The program does not interpret or enforce uniqueness on it: it is an",
+              "opaque correlation id. Replay protection is the submitter's job, as it is",
+              "on L1."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawLimitUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "cap",
+            "type": "u64"
+          },
+          {
+            "name": "window_seconds",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WithdrawerUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "previous",
+            "type": "pubkey"
+          },
+          {
+            "name": "current",
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ]
+}

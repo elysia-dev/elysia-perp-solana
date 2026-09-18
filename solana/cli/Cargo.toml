@@ -1,0 +1,24 @@
+[package]
+name = "vault-cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "vault"
+path = "src/main.rs"
+
+[dependencies]
+# `no-entrypoint` so linking the program as a library does not pull in its BPF
+# entrypoint. Gives us the generated `accounts`/`instruction` modules, so the
+# instruction layouts here can never drift from the deployed program's.
+elysia_perp = { path = "../programs/elysia_perp", features = ["no-entrypoint"] }
+anchor-lang = { version = "0.32.1", features = ["event-cpi"] }
+# Signing and transaction construction only. RPC is hand-rolled JSON over
+# reqwest rather than solana-client: three methods, and it keeps the dependency
+# tree to the one already proven to resolve against anchor 0.32.
+solana-sdk = "2.3"
+reqwest = { version = "0.12", features = ["json", "blocking"] }
+serde_json = "1"
+bs58 = "0.5"
+base64 = "0.22"
+bincode = "1.3"

@@ -1,0 +1,40 @@
+[package]
+name = "elysia_perp"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "elysia_perp"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+anchor-debug = []
+custom-heap = []
+custom-panic = []
+
+
+[dependencies]
+anchor-lang = { version = "0.32.1", features = ["init-if-needed", "event-cpi"] }
+anchor-spl = "0.32.1"
+
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }
+
+# Pinned to the tree anchor-lang 0.32.1 already resolves (solana-program 2.3,
+# spl-token 8, ATA 7). litesvm/solana-sdk track solana's own release train, so a
+# newer pair pulls a second, incompatible copy of solana-* and fails to resolve.
+[dev-dependencies]
+bs58 = "0.5"
+litesvm = "0.7"
+solana-sdk = "2.3"
+spl-associated-token-account = "7.0"
+spl-token = "8.0"
+spl-token-2022 = "8.0"
