@@ -75,8 +75,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // suppressHydrationWarning: privacy browser extensions (e.g. the Google
+  // Analytics opt-out add-on) inject attributes like
+  // `data-google-analytics-opt-out` onto <html> before React hydrates, which
+  // would otherwise log a hydration-mismatch warning.
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/*
           Chunk-recovery guard — auto-reload when the browser is holding
