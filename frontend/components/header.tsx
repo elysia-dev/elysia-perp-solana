@@ -16,11 +16,13 @@ import {
   ArrowUpFromLine,
   ArrowUpRight,
   LogOut,
+  Coins,
 } from "lucide-react"
 import { useAuth } from "@/lib/hooks/useAuth"
 import { useSolBalance } from "@/lib/solana/useSolBalance"
 import { SolanaDepositModal } from "@/components/solana-deposit-modal"
 import { SolanaWithdrawModal } from "@/components/solana-withdraw-modal"
+import { MintModal } from "@/components/mint-modal"
 import { AuthModal } from "@/components/auth-modal"
 import { DevToolbar } from "@/components/dev/dev-toolbar"
 import { useBalance } from "@/lib/hooks/useBalance"
@@ -104,6 +106,7 @@ export function Header() {
   // the vault program lives on). Replaces the EVM ERC20 read.
   const { data: solBalance } = useSolBalance()
   const [popoverOpen, setPopoverOpen] = useState(false)
+  const [mintOpen, setMintOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Close mobile menu on route change
@@ -285,6 +288,17 @@ export function Header() {
             </a>
           </Button>
 
+          {/* Mint (UI only — opens a non-functional mint form) */}
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1.5"
+            onClick={() => setMintOpen(true)}
+          >
+            <Coins className="h-4 w-4" />
+            Mint
+          </Button>
+
           {/* Wallet connect / address popover */}
           <div
             {...(!mounted && {
@@ -459,6 +473,8 @@ export function Header() {
           Deposit/Withdraw modals are not rendered on this Solana-only build. */}
       <SolanaDepositModal open={depositOpen} onOpenChange={setDepositOpen} />
       <SolanaWithdrawModal open={withdrawOpen} onOpenChange={setWithdrawOpen} />
+      {/* Mint modal — UI only, no on-chain mint wired yet. */}
+      <MintModal open={mintOpen} onOpenChange={setMintOpen} />
 
       <AuthModal
         open={showAuthModal}
