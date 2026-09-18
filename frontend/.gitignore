@@ -49,3 +49,6 @@ next-env.d.ts
 
 # solana deposit test key (local only)
 scripts/.deposit-test-key.json
+
+# Proprietary TradingView charting library — not redistributable
+public/static/charting_library/
