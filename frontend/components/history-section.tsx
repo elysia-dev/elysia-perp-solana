@@ -25,6 +25,7 @@ import { tradingToast } from "@/lib/utils/toast"
 import type { PerpOrder, Trade } from "@/types"
 import { PositionsTab } from "@/components/history/PositionsTab"
 import { AssetsTab } from "@/components/history/AssetsTab"
+import { MEME_ASSET_ID } from "@/lib/solana/meme"
 import { PerpOpenOrdersTab } from "@/components/history/PerpOpenOrdersTab"
 import { PerpOrderHistoryTab } from "@/components/history/PerpOrderHistoryTab"
 import { TradeHistoryTab } from "@/components/history/TradeHistoryTab"
@@ -71,7 +72,10 @@ export function HistorySection() {
   const positionsCount = positions.filter(
     (p) => parseFloat(p.size) !== 0
   ).length
-  const assetsCount = balance?.balances?.length ?? 0
+  // Only MEME is surfaced in the Assets tab (public Solana build), so the tab
+  // badge counts MEME balances too — not every asset /account returns.
+  const assetsCount =
+    balance?.balances?.filter((b) => b.asset_id === MEME_ASSET_ID).length ?? 0
   const openOrdersCount = openOrdersData?.orders?.length ?? 0
 
   // Filter by side
